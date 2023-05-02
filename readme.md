@@ -4,9 +4,7 @@
 
 ## Getting started
 
-Install python dependencies (requirements.txt)
-
-Then probably just run server/manage.py runserver
+run run.sh
 
 ## Description
 
