@@ -4,7 +4,7 @@
 
 ## Getting started
 
-Install python dependencies (run init.py)
+Install python dependencies (requirements.txt)
 
 Then probably just run server/manage.py runserver
 
