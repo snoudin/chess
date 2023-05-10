@@ -9,7 +9,7 @@ from .models import User
 def home(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
-            return redirect('/play/infinite/')
+            return redirect(f'/play/{request.POST["type"]}/')
         return redirect('/login')
     return render(request, 'basic/frontend/home.html')
 

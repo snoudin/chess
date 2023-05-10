@@ -4,4 +4,5 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('infinite/', views.online_game),
+    path('bot/', views.bot),
 ]

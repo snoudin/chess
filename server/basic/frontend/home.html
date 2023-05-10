@@ -36,14 +36,16 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="submit", value="Play online">
+                <input type="text" name="type" style="display: none" value="infinite">
                 <h1>No time control for now, sorry!</h1>
             </form>
         </td>
         <td>
             <form method="post">
                 {% csrf_token %}
-                <input type="submit", value="Play with bot", disabled>
-                <h1>Coming soon!</h1>
+                <input type="submit", value="Play with bot">
+                <input type="text" name="type" style="display: none" value="bot">
+                <h1>In progress</h1>
             </form>
         </td>
     </tr>

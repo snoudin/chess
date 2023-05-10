@@ -35,9 +35,6 @@
 <body>
     <div class="centering">
         <div class="container">
-            <h1 id="loading">Waiting for other player...</h1>
-            <h1 id="result"></h1><br>
-            <h1 id="disconnect" style='display: none'>Opponent disconnected</h1><br>
             <div id="board", class="chessboard"></div><br>
             <table id="white-chooser" style='display: none'>
                 <td>
@@ -74,7 +71,7 @@
 <script type="text/javascript">
 
     const moveSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/play/infinite/'
+        'ws://' + window.location.host + '/ws/play/bot/'
     );
 
     var enabled = true
@@ -85,7 +82,6 @@
 
     moveSocket.onmessage = function(e) {
         if (Board === null) { //init board
-            document.getElementById('loading').style.display = 'none'
             color = JSON.parse(e.data).color
             Board = Chessboard('board', {
                 position: 'start',
@@ -96,14 +92,6 @@
         }
         const data = JSON.parse(e.data)
         if (data.type == 'moves') {
-            var taken_coords = data.taken
-            for (const ind in taken_coords) {
-                var clear = taken_coords[ind]
-                var new_pos = Board.position()
-                delete new_pos[clear]
-                delete new_pos.clear
-                Board.position(new_pos, false)
-            }
             for (const ind in data.moves) {
                 var move = data.moves[ind]
                 if (move.length == 5) {
@@ -119,14 +107,9 @@
                 }
             }
         }
-        else if (data.type == 'result') {
-            document.getElementById('result').innerHTML = data.result
-            enabled = false
-        }
         else if (data.type == 'disconnect') {
             enabled = false
             moveSocket.close()
-            document.getElementById('disconnect').style.display = 'block'
         }
         else {
             document.getElementById(color + '-chooser').style.display = 'block'
