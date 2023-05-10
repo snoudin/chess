@@ -4,9 +4,12 @@
 
 ## Getting started
 
-Install python dependencies and build c++ binaries (run init.py)
+### Automated:
+execute run.sh
 
-Then probably just run server/manage.py runserver
+### Manually
+run init.py
+then launch server/manage.py with your parameters (runserver for usual start on 8000 port)
 
 ## Description
 
