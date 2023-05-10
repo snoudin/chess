@@ -100,6 +100,7 @@ class MultiplayerConsumer(AsyncWebsocketConsumer):
 class BotConsumer(AsyncWebsocketConsumer):
     async def make_move(self):
         moves = await communicate(self.bot, "generate")
+        print("generated", moves)
 
         def create_move(data):
             res = chr(ord('a') + ord(data[0]) - ord('0')) + chr(ord(data[1]) + 1) + '-'\

@@ -38,7 +38,7 @@ std::shared_ptr<Move> get_best_move(Board& position) {
     Color current = position.get_color();
     for (auto move : moves) {
         position.make_move(move);
-        evaluation.push_back(evaluate(position, 5, current));
+        evaluation.push_back(evaluate(position, 0, current));
         position.rollback_move();
     }
     auto it = evaluation.end();
