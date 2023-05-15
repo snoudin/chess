@@ -1,6 +1,6 @@
 #pragma once
 
-#include "board.h"
+#include "../headers/board.h"
 
 double evaluate(Board& game) {
     return 0;

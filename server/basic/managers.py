@@ -30,4 +30,3 @@ class CustomUserManager(BaseUserManager):
         user.is_active = True
         user.save()
         return user
-

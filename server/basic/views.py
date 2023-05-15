@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from django.contrib.auth.models import auth
-import django.contrib.auth
+# import django.contrib.auth
 from .models import User
 
-# Create your views here.
 
 def home(request):
     if request.method == 'POST':
@@ -13,8 +12,10 @@ def home(request):
         return redirect('/login')
     return render(request, 'basic/frontend/home.html')
 
+
 def redirect_to_home(request):
     return redirect('/home')
+
 
 def login(request):
     if request.method == 'POST':
@@ -26,6 +27,7 @@ def login(request):
             return redirect('/home')
         return render(request, 'basic/frontend/login.html', {'form': err_form})
     return render(request, 'basic/frontend/login.html')
+
 
 def register(request):
     if request.method == 'POST':
@@ -45,13 +47,14 @@ def register(request):
         if not password2:
             err_form += 'Repeat your password\n'
         if password1 != password2:
-            err += 'Password must be same\n'
+            err_form += 'Password must be same\n'
         if err_form:
-            return render(request, 'basic/frontend/registration.html', { 'form': err_form })
+            return render(request, 'basic/frontend/registration.html', {'form': err_form})
         user = User.objects.create_user(email, username, password1)
         user.save()
         return redirect('/home')
     return render(request, 'basic/frontend/registration.html')
+
 
 def logout(request):
     auth.logout(request)

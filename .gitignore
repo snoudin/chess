@@ -2,6 +2,5 @@
 *.pyc
 /bin
 server/binary_paths
-tests/process_test.py
-tests/test
-
+tests_data/*.py
+tests_data/test

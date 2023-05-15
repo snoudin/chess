@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .managers import CustomUserManager 
+from .managers import CustomUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -24,15 +24,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-
 class UserSerializer(BaseSerializer):
     def serialize(self):
         return repr(str(self)), {'from basic.models import User'}
 
 
-
 MigrationWriter.register_serializer(User, UserSerializer)
-
 
 
 class ChessGame(models.Model):
@@ -41,5 +38,3 @@ class ChessGame(models.Model):
     black = models.ForeignKey(User, models.SET(default_user), related_name='+', default=default_user)
     result = models.CharField(max_length=1)
     _id = models.IntegerField(primary_key=True)
-    
-

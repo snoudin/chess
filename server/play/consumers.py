@@ -1,15 +1,27 @@
 import json
+    iheck_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    process_query(position_count, game, cin);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    check_output(position_count, game, cin, test_out);
+    process_query(position_count, game, cin);
+    check_output(position_count, game, cin, test_out);
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from random import choice
 from asyncio import create_subprocess_exec, subprocess
 from pathlib import Path
-import time
 
 paths_file = Path(__file__).resolve().parent.parent / "binary_paths"
 paths = eval(open(paths_file, "r").read())
 
-queue = list()
+queue = []
 
 
 def get_coords(move_string):
@@ -22,19 +34,18 @@ def get_coords(move_string):
 
 
 async def communicate(process, data, wait_for_result=True):
-    print(data)
     process.stdin.write((data + "\n").encode('ascii'))
     await process.stdin.drain()
     if wait_for_result:
         res = await process.stdout.readline()
         res = res.decode('ascii').strip()
-        print(res)
         return res
 
 
 class MultiplayerConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
+        self.pair = None
         if queue:
             self.pair = queue[-1]
             queue[-1].pair = self
@@ -43,7 +54,9 @@ class MultiplayerConsumer(AsyncWebsocketConsumer):
             queue.pop()
             await self.pair.send(text_data=json.dumps({"type": "opponent found", "color": "white"}))
             await self.send(text_data=json.dumps({"type": "opponent found", "color": "black"}))
-            self.validator = await create_subprocess_exec(paths["multiplayer"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            self.validator = await create_subprocess_exec(paths["multiplayer"],
+                                                          stdin=subprocess.PIPE,
+                                                          stdout=subprocess.PIPE)
             self.pair.validator = self.validator
         else:
             queue.append(self)
@@ -52,7 +65,7 @@ class MultiplayerConsumer(AsyncWebsocketConsumer):
         if queue and queue[-1] == self:
             queue.pop()
         await self.pair.send(text_data=json.dumps({"type": "disconnect"}))
-        if self.validator:
+        if self.pair:
             self.pair.validator = None
             self.validator.stdin.close()
             self.validator.terminate()
@@ -63,7 +76,7 @@ class MultiplayerConsumer(AsyncWebsocketConsumer):
         valid = int(await communicate(self.validator, "check " + " ".join(get_coords(move))))
         if valid:
             promotion = int(await communicate(self.validator, "is_promotion " + " ".join(get_coords(move))))
-            if move[-1] not in ['Q', 'N', 'R', 'B'] and promotion: # check if need promotion
+            if move[-1] not in ['Q', 'N', 'R', 'B'] and promotion:  # check if need promotion
                 await self.send(text_data=json.dumps({"type": "promotion_query"}))
                 return
             castling = int(await communicate(self.validator, "is_castle " + " ".join(get_coords(move))))
@@ -76,8 +89,10 @@ class MultiplayerConsumer(AsyncWebsocketConsumer):
             if castling:
                 other = await communicate(self.validator, "castle " + " ".join(get_coords(move)))
                 coords = list(map(int, other.split()))
-                other = chr(ord('a') + coords[0]) + str(1 + coords[1]) + '-' + chr(ord('a') + coords[2]) + str(1 + coords[3])
-                message = json.dumps({"type": "moves", "moves": [move, other], "color": self.color, "taken": taken_coords})
+                other = chr(ord('a') + coords[0]) + str(1 + coords[1]) + '-' + \
+                    chr(ord('a') + coords[2]) + str(1 + coords[3])
+                message = json.dumps({"type": "moves", "moves": [move, other],
+                                      "color": self.color, "taken": taken_coords})
             await self.send(text_data=message)
             await self.pair.send(text_data=message)
             full = {'R': 'Rook', 'N': 'Knight', 'Q': 'Queen', 'B': 'Bishop'}
@@ -100,7 +115,6 @@ class MultiplayerConsumer(AsyncWebsocketConsumer):
 class BotConsumer(AsyncWebsocketConsumer):
     async def make_move(self):
         moves = await communicate(self.bot, "generate")
-        print("generated", moves)
 
         def create_move(data):
             res = chr(ord('a') + ord(data[0]) - ord('0')) + chr(ord(data[1]) + 1) + '-'\
@@ -117,9 +131,16 @@ class BotConsumer(AsyncWebsocketConsumer):
                 res.append(create_move(coords[5 * i: 5 * i + 5]))
             return res
 
+        to_move = moves.split()[:5]
         moves = parse(moves)
         revcolor = "black" if self.color == "white" else "white"
-        await self.send(text_data=json.dumps({"type": "moves", "moves": moves, "color": revcolor}))
+        taken = await communicate(self.bot, "sth_taken " + " ".join(get_coords(moves[0])))
+        taken_coords = []
+        if taken != "none":
+            taken = taken.split(' ')
+            taken_coords = [chr(ord('a') + int(taken[0])) + str(1 + int(taken[1]))]
+        await self.send(text_data=json.dumps({"type": "moves", "moves": moves,
+                                              "color": revcolor, "taken": taken_coords}))
         result = await communicate(self.bot, "result " + " ".join(get_coords(moves[0])))
         if result != "none":
             result_string = "draw"
@@ -129,6 +150,7 @@ class BotConsumer(AsyncWebsocketConsumer):
                 result_string = "black won!"
             result_json = json.dumps({"type": "result", "result": result_string})
             await self.send(text_data=result_json)
+        await communicate(self.bot, "make_move " + " ".join(to_move), False)
 
     async def connect(self):
         await self.accept()
@@ -148,16 +170,24 @@ class BotConsumer(AsyncWebsocketConsumer):
         valid = int(await communicate(self.bot, "check " + " ".join(get_coords(move))))
         if valid:
             promotion = int(await communicate(self.bot, "is_promotion " + " ".join(get_coords(move))))
-            if move[-1] not in ['Q', 'N', 'R', 'B'] and promotion: # check if need promotion
+            if move[-1] not in ['Q', 'N', 'R', 'B'] and promotion:  # check if need promotion
                 await self.send(text_data=json.dumps({"type": "promotion_query"}))
                 return
             castling = int(await communicate(self.bot, "is_castle " + " ".join(get_coords(move))))
             message = json.dumps({"type": "moves", "moves": [move], "color": self.color})
+            taken = await communicate(self.bot, "sth_taken " + " ".join(get_coords(move)))
+            taken_coords = []
+            if taken != "none":
+                taken = taken.split(' ')
+                taken_coords = [chr(ord('a') + int(taken[0])) + str(1 + int(taken[1]))]
+            message = json.dumps({"type": "moves", "moves": [move], "color": self.color, "taken": taken_coords})
             if castling:
                 other = await communicate(self.bot, "castle " + " ".join(get_coords(move)))
                 coords = list(map(int, other.split()))
-                other = chr(ord('a') + coords[0]) + str(1 + coords[1]) + '-' + chr(ord('a') + coords[2]) + str(1 + coords[3])
-                message = json.dumps({"type": "moves", "moves": [move, other], "color": self.color})
+                other = chr(ord('a') + coords[0]) + str(1 + coords[1]) + \
+                    '-' + chr(ord('a') + coords[2]) + str(1 + coords[3])
+                message = json.dumps({"type": "moves", "moves": [move, other],
+                                      "color": self.color, "taken": taken_coords})
             await self.send(text_data=message)
             full = {'R': 'Rook', 'N': 'Knight', 'Q': 'Queen', 'B': 'Bishop'}
             res_piece = "none"
@@ -175,4 +205,3 @@ class BotConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=result_json)
                 return
             await self.make_move()
-

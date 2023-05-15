@@ -1,14 +1,27 @@
 #pragma once
 
-#include "board.h"
 #include <iostream>
 #include <string>
+#include <unordered_map>
+#include <memory>
+#include <vector>
+#include "../headers/board.h"
+
+std::unordered_map<std::string, PieceType> from_string_to_piecetype = {
+        {"Pawn", PieceType::pawn},
+        {"King", PieceType::king},
+        {"Queen", PieceType::queen},
+        {"Bishop", PieceType::bishop},
+        {"Knight", PieceType::knight},
+        {"Rook", PieceType::rook}
+};
 
 std::string out(bool code) {
     return std::string() + (code ? '1' : '0');
 }
 
-std::string process_query(std::unordered_map<size_t, size_t>& position_count, Board& game, std::basic_istream<char>& cin) {
+std::string process_query(std::unordered_map<size_t, size_t>& position_count,
+                          Board& game, std::basic_istream<char>& cin) {
     std::string s;
     int x_from, y_from, x_to, y_to;
     cin >> s >> x_from >> y_from >> x_to >> y_to;
@@ -49,7 +62,7 @@ std::string process_query(std::unordered_map<size_t, size_t>& position_count, Bo
             auto ptr = dynamic_cast<const PromotionMove*>(&(*move));
             if (ptr) {
                 return ptr->getFrom() == from && ptr->getTo() == to &&
-                       (name == "none" || ptr->getNewPiece()->getName() == name);
+                       (name == "none" || ptr->getNewPiece()->getName() == from_string_to_piecetype[name]);
             }
             auto ptr2 = dynamic_cast<const CastleMove*>(&(*move));
             if (ptr2) {
@@ -82,8 +95,9 @@ std::string process_query(std::unordered_map<size_t, size_t>& position_count, Bo
             }
             return false;
         });
-        if (it == moves.end()) return "shit!!!";
-        else {
+        if (it == moves.end()) {
+            return "shit!!!";
+        } else {
             auto mv = dynamic_cast<CastleMove*>(&**it);
             return
             std::to_string(mv->getRookFrom().get_x())

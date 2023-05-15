@@ -1,7 +1,7 @@
-#include "eval.h"
-#include "main.h"
 #include <sstream>
 #include <memory>
+#include "eval.h"
+#include "main.h"
 
 double evaluate(Board& position, int depth_left, Color current, double white_best = -100, double black_best = 100) {
     if (depth_left == 0) return evaluate(position);
@@ -81,7 +81,8 @@ int main() {
             auto castle_ptr = dynamic_cast<const CastleMove*>(&(*move));
             if (promotion_ptr) {
                 geometry::Point from = promotion_ptr->getFrom(), to = promotion_ptr->getTo();
-                std::cout << from.get_x() << " " << from.get_y() << " " << to.get_x() << " " << to.get_y() << " " << promotion_ptr->getNewPiece()->getName();
+                std::cout << from.get_x() << " " << from.get_y() << " " << to.get_x() << " "
+                          << to.get_y() << " " << promotion_ptr->getNewPiece()->getName();
             } else if (castle_ptr) {
                 geometry::Point from = castle_ptr->getKingFrom(), to = castle_ptr->getKingTo();
                 std::cout << from.get_x() << " " << from.get_y() << " " << to.get_x() << " " << to.get_y() << " none ";
@@ -94,7 +95,6 @@ int main() {
             }
             std::cout << "\n";
             std::cout.flush();
-            game.make_move(move);
         }
     }
 }
