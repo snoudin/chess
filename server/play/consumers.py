@@ -1,18 +1,4 @@
 import json
-    iheck_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    process_query(position_count, game, cin);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    check_output(position_count, game, cin, test_out);
-    process_query(position_count, game, cin);
-    check_output(position_count, game, cin, test_out);
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 from random import choice
 from asyncio import create_subprocess_exec, subprocess

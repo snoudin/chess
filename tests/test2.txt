@@ -1,6 +1,0 @@
-check 4 1 4 3
-is_promotion 4 1 4 3
-is_castle 4 1 4 3
-make_move 4 1 4 3 none
-check 3 6 3 4
-

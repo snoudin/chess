@@ -1,2 +1,0 @@
-Django>=4.1.7
-channels[daphne]>=4.0.0
