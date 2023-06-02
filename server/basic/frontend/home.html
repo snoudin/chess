@@ -1,0 +1,55 @@
+{% extends "basic/frontend/template.html" %}
+{% block article %}
+
+<style>
+    .main {
+        margin: auto;
+        width: 80%;
+        height: 70%;
+        position: absolute;
+        top: 15%;
+        left: 10%;
+    }
+
+    table, th, td {
+        border: 1px solid;
+        height: 100%;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    td {
+        width: 50%;
+        margin: auto;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+</style>
+
+<div class=main>
+    <table>
+    <tr>
+        <td>
+            <form method="post">
+                {% csrf_token %}
+                <input type="submit", value="Play online">
+                <input type="text" name="type" style="display: none" value="infinite">
+                <h1>No time control for now, sorry!</h1>
+            </form>
+        </td>
+        <td>
+            <form method="post">
+                {% csrf_token %}
+                <input type="submit", value="Play with bot">
+                <input type="text" name="type" style="display: none" value="bot">
+                <h1>In progress</h1>
+            </form>
+        </td>
+    </tr>
+    </table>
+</div>
+
+{% endblock %}

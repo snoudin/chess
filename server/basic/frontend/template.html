@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        header{
+            background: #d2d2d2;
+            text-align: right;
+            padding: 10px;
+            border-bottom: solid 1px #543864;
+        }
+        footer{
+            background: #d2d2d2;
+            text-align: left;
+            margin-top: 30px;
+        }
+        article{
+
+        }
+        body{
+            background-color: #ebebeb;
+        }
+        a.disabled {
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .warn {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    {% block style %}{% endblock %}
+    {% block script %}{% endblock %}
+</head>
+<body>
+<header>
+    <div>
+        {% if user.is_authenticated %}
+            <a href="/logout/" style="color: #2ecc71">Log out</a>
+        {% else %}
+            <a href="/login/" style="color: #2ecc71">Log in</a> <a style="color: black" class="disabled">/</a> 
+            <a href="/registration/" style="color: #2ecc71">Sign up</a>
+        {% endif %}
+    </div>
+</header>
+{% block article %}{% endblock %}
+<footer>
+
+
+</footer>
+</body>
+</html>
